@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5674:5672
+        - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: wanda
+      RABBITMQ_DEFAULT_PASS: wanda
+    volumes:
+        - rabbitmq-data:/var/lib/rabbitmq/
+        - rabbitmq-logs:/var/log/rabbitmq/
+
+volumes:
+  rabbitmq-data:
+  rabbitmq-logs:

@@ -7,13 +7,13 @@ use amqprs::{
 use log::{debug, error};
 
 pub struct RabbitMqConsumer {
-    policy: Box<dyn EventsPolicy>,
+    policy: EventsPolicy,
 }
 
 impl RabbitMqConsumer {
-    pub fn new(events_policy: impl EventsPolicy + 'static) -> RabbitMqConsumer {
+    pub fn new(events_policy: EventsPolicy) -> RabbitMqConsumer {
         RabbitMqConsumer {
-            policy: Box::new(events_policy),
+            policy: events_policy,
         }
     }
 }

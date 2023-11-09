@@ -3,7 +3,7 @@ extern crate log;
 
 mod events;
 
-use crate::events::{ProtobufEventsPolicy, RabbitMqConsumer};
+use crate::events::{EventsPolicy, RabbitMqConsumer};
 
 use amqprs::{
     callbacks::{DefaultChannelCallback, DefaultConnectionCallback},
@@ -64,7 +64,7 @@ async fn main() {
         .manual_ack(true)
         .finish();
 
-    let policy = ProtobufEventsPolicy::new("host_id")
+    let policy = EventsPolicy::new("host_id")
         .expect("unable to create protobuf event policy, fatal");
     let rabbit_consumer = RabbitMqConsumer::new(policy);
 

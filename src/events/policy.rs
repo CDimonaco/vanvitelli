@@ -93,7 +93,7 @@ fn map_fact_gathering_request_from_event(
             .get_or_insert(&Vec::new())
             .to_vec();
 
-            fact_requests_for_gatherer.insert(request.gatherer, gatherer_requests);
+        fact_requests_for_gatherer.insert(request.gatherer, gatherer_requests);
     }
 
     FactsGatheringRequest {

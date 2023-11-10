@@ -2,6 +2,7 @@
 extern crate log;
 
 mod events;
+mod gatherers;
 
 use crate::events::{EventsPolicy, RabbitMqConsumer};
 
@@ -64,8 +65,8 @@ async fn main() {
         .manual_ack(true)
         .finish();
 
-    let policy = EventsPolicy::new("host_id")
-        .expect("unable to create protobuf event policy, fatal");
+    let policy =
+        EventsPolicy::new("host_id").expect("unable to create protobuf event policy, fatal");
     let rabbit_consumer = RabbitMqConsumer::new(policy);
 
     channel

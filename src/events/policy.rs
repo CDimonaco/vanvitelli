@@ -88,10 +88,11 @@ fn map_fact_gathering_request_from_event(
     let mut fact_requests_for_gatherer: HashMap<String, Vec<FactRequest>> = HashMap::new();
 
     for request in fact_requests {
-        let gatherer_requests: Vec<FactRequest> = fact_requests_for_gatherer
+        let mut gatherer_requests: Vec<FactRequest> = fact_requests_for_gatherer
             .get(&request.gatherer)
-            .get_or_insert(&Vec::new())
+            .get_or_insert(&vec![])
             .to_vec();
+        gatherer_requests.push(request.clone());
 
         fact_requests_for_gatherer.insert(request.gatherer, gatherer_requests);
     }
@@ -100,5 +101,120 @@ fn map_fact_gathering_request_from_event(
         execution_id: execution_id,
         group_id: group_id,
         facts_requests_by_gatherer: fact_requests_for_gatherer,
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use trento_contracts::stubs::facts_gathering_requested::FactRequest;
+
+    use super::*;
+
+    #[test]
+    fn test_fact_gathering_request_from_event() {
+        let execution_id = "exec1";
+        let group_id = "group1";
+
+        let first_target = FactsGatheringRequestedTarget {
+            agent_id: "agent_1".to_owned(),
+            fact_requests: vec![
+                FactRequest {
+                    argument: "arg1".to_owned(),
+                    check_id: "check1".to_owned(),
+                    gatherer: "test_gat".to_owned(),
+                    name: "fact1".to_owned(),
+                    ..Default::default()
+                },
+                FactRequest {
+                    argument: "arg2".to_owned(),
+                    check_id: "check1".to_owned(),
+                    gatherer: "test_gat".to_owned(),
+                    name: "fact2".to_owned(),
+                    ..Default::default()
+                },
+            ],
+            ..Default::default()
+        };
+
+        let second_target = FactsGatheringRequestedTarget {
+            agent_id: "agent_1".to_owned(),
+            fact_requests: vec![
+                FactRequest {
+                    argument: "arg1".to_owned(),
+                    check_id: "check1".to_owned(),
+                    gatherer: "test_gat3".to_owned(),
+                    name: "fact3".to_owned(),
+                    ..Default::default()
+                },
+                FactRequest {
+                    argument: "arg1".to_owned(),
+                    check_id: "check1".to_owned(),
+                    gatherer: "test_gat4".to_owned(),
+                    name: "fact4".to_owned(),
+                    ..Default::default()
+                },
+            ],
+            ..Default::default()
+        };
+
+        let targets: Vec<&FactsGatheringRequestedTarget> = vec![
+            &first_target,
+            &second_target
+        ];
+
+        let fact_requests: HashMap<String, Vec<super::FactRequest>> = vec![
+            (
+                "test_gat".to_owned(),
+                vec![
+                    super::FactRequest {
+                        argument: "arg1".to_owned(),
+                        check_id: "check1".to_owned(),
+                        gatherer: "test_gat".to_owned(),
+                        name: "fact1".to_owned(),
+                    },
+                    super::FactRequest {
+                        argument: "arg2".to_owned(),
+                        check_id: "check1".to_owned(),
+                        gatherer: "test_gat".to_owned(),
+                        name: "fact2".to_owned(),
+                    },
+                ],
+            ),
+            (
+                "test_gat4".to_owned(),
+                vec![super::FactRequest {
+                    argument: "arg1".to_owned(),
+                    check_id: "check1".to_owned(),
+                    gatherer: "test_gat4".to_owned(),
+                    name: "fact4".to_owned(),
+                }],
+            ),
+            (
+                "test_gat3".to_owned(),
+                vec![super::FactRequest {
+                    argument: "arg1".to_owned(),
+                    check_id: "check1".to_owned(),
+                    gatherer: "test_gat3".to_owned(),
+                    name: "fact3".to_owned(),
+                }],
+            ),
+        ]
+        .into_iter()
+        .collect();
+        let expected_request = FactsGatheringRequest {
+            execution_id: execution_id.to_owned(),
+            group_id: group_id.to_owned(),
+            facts_requests_by_gatherer: fact_requests,
+        };
+
+        let result = map_fact_gathering_request_from_event(targets.clone(), execution_id.to_owned(), group_id.to_owned());
+
+
+        assert_eq!(result.execution_id, expected_request.execution_id);
+        assert_eq!(result.group_id, expected_request.group_id);
+        assert_eq!(result.facts_requests_by_gatherer.get("test_gat").unwrap(), expected_request.facts_requests_by_gatherer.get("test_gat").unwrap());
+        assert_eq!(result.facts_requests_by_gatherer.get("test_gat3").unwrap(), expected_request.facts_requests_by_gatherer.get("test_gat3").unwrap());
+        assert_eq!(result.facts_requests_by_gatherer.get("test_gat4").unwrap(), expected_request.facts_requests_by_gatherer.get("test_gat4").unwrap());
+
     }
 }

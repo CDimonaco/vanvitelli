@@ -20,7 +20,7 @@ pub struct FactsGathered {
     pub group_id: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct FactRequest {
     pub argument: String,
     pub check_id: String,
@@ -28,6 +28,7 @@ pub struct FactRequest {
     pub name: String,
 }
 
+#[derive(PartialEq, Eq, Debug)]
 pub struct FactsGatheringRequest {
     pub execution_id: String,
     pub group_id: String,

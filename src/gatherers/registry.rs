@@ -227,11 +227,8 @@ mod tests {
 
         let registry = builder.build_registry();
 
-        let gatherer = registry
-            .get_gatherer("test_gatherer".to_owned())
-            .unwrap();
+        let gatherer = registry.get_gatherer("test_gatherer".to_owned()).unwrap();
 
         assert_eq!(gatherer.name(), "test_gatherer_v2".to_owned())
     }
-    
 }
